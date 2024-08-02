@@ -31,8 +31,8 @@ public class ListProjectService {
         project.setNama_project(projectDetails.getNama_project());
         project.setTeknologi(projectDetails.getTeknologi());
         project.setDeveloper(projectDetails.getDeveloper());
-        project.setLogo(projectDetails.getLogo());
         project.setLink(projectDetails.getLink());
+        project.setDeskripsi_project(projectDetails.getDeskripsi_project());
 
         return listProjectRepository.save(project);
     }

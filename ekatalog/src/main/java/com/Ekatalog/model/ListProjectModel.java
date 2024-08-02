@@ -47,14 +47,6 @@ public class ListProjectModel {
         this.developer = developer;
     }
 
-    public String getLogo() {
-        return logo;
-    }
-
-    public void setLogo(String logo) {
-        this.logo = logo;
-    }
-
     public String getLink() {
         return link;
     }
@@ -69,10 +61,17 @@ public class ListProjectModel {
     @Column(name = "developer")
     private String developer;
 
-    @Column(name = "logo")
-    private String logo;
-
     @Column(name = "link")
     private String link;
 
+    @Column(name = "deskripsi_project")
+    private String deskripsi_project;
+
+    public String getDeskripsi_project() {
+        return deskripsi_project;
+    }
+
+    public void setDeskripsi_project(String deskripsi_project) {
+        this.deskripsi_project = deskripsi_project;
+    }
 }
