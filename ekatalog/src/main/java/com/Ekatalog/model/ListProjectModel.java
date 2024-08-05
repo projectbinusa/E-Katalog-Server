@@ -15,6 +15,18 @@ public class ListProjectModel {
     @Column(name = "nama_project")
     private String nama_project;
 
+    @Column(name = "teknologi")
+    private String teknologi;
+
+    @Column(name = "developer")
+    private String developer;
+
+    @Column(name = "link")
+    private String link;
+
+    @Column(name = "deskripsi_project")
+    private String deskripsi_project;
+
     public Long getId() {
         return Id;
     }
@@ -23,12 +35,12 @@ public class ListProjectModel {
         Id = id;
     }
 
-    public String getNama_project() {
-        return nama_project;
+    public String getDeskripsi_project() {
+        return deskripsi_project;
     }
 
-    public void setNama_project(String nama_project) {
-        this.nama_project = nama_project;
+    public void setDeskripsi_project(String deskripsi_project) {
+        this.deskripsi_project = deskripsi_project;
     }
 
     public String getTeknologi() {
@@ -55,23 +67,11 @@ public class ListProjectModel {
         this.link = link;
     }
 
-    @Column(name = "teknologi")
-    private String teknologi;
-
-    @Column(name = "developer")
-    private String developer;
-
-    @Column(name = "link")
-    private String link;
-
-    @Column(name = "deskripsi_project")
-    private String deskripsi_project;
-
-    public String getDeskripsi_project() {
-        return deskripsi_project;
+    public String getNama_project() {
+        return nama_project;
     }
 
-    public void setDeskripsi_project(String deskripsi_project) {
-        this.deskripsi_project = deskripsi_project;
+    public void setNama_project(String nama_project) {
+        this.nama_project = nama_project;
     }
 }
