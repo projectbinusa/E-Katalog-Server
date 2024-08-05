@@ -17,12 +17,12 @@ public class ListProjectController {
     @Autowired
     private ListProjectService listProjectService;
 
-    @GetMapping
+    @GetMapping("/all")
     public List<ListProjectModel> getAllProjects() {
         return listProjectService.getAllProjects();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/by-id/{id}")
     public ResponseEntity<ListProjectModel> getProjectById(@PathVariable Long id) {
         Optional<ListProjectModel> project = listProjectService.getProjectById(id);
         if (project.isPresent()) {
@@ -32,12 +32,12 @@ public class ListProjectController {
         }
     }
 
-    @PostMapping("/api/add")
+    @PostMapping("/add")
     public ListProjectModel addProject(@RequestBody ListProjectModel listProject) {
         return listProjectService.addProject(listProject);
     }
 
-    @PutMapping("/api/ubah/{id}")
+    @PutMapping("/ubah/{id}")
     public ResponseEntity<ListProjectModel> updateProject(@PathVariable Long id, @RequestBody ListProjectModel projectDetails) {
         try {
             ListProjectModel updatedProject = listProjectService.updateProject(id, projectDetails);
@@ -47,7 +47,7 @@ public class ListProjectController {
         }
     }
 
-    @DeleteMapping("/api/{id}")
+    @DeleteMapping("/hapus/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
         listProjectService.deleteProject(id);
         return ResponseEntity.noContent().build();

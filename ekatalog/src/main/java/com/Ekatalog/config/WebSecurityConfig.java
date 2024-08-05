@@ -56,7 +56,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/pengguna/add",
             "/api/login",
             "/api/register",
-
+            "/api/change-password",
+            "/api/all",
+            "/api/by-id/{id}",
+            "/api/add",
+            "/api/ubah/{id}",
+            "/api/hapus/{id}"
 
     };
 
