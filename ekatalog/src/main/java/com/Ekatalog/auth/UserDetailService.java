@@ -22,10 +22,11 @@ public class UserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) {
         UserModel user;
         if (penggunaRepository.findByEmail(username).isPresent()) {
-            user = penggunaRepository.findByEmail(username).orElseThrow(() -> new NotFoundException("Username Not Found"));
+            user = penggunaRepository.findByEmail(username).orElseThrow(() -> new NotFoundException("Username tidak di temukan"));
         }else {
-            throw new NotFoundException("User Not Found with username or email: " + username);
+            throw new NotFoundException("Pengguna tidak ditemukan dengan nama pengguna atau email: " + username);
         }
         return UserDetail.buildUser(user);
     }
+
 }

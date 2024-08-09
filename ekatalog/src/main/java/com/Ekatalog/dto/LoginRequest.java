@@ -1,7 +1,11 @@
 package com.Ekatalog.dto;
 
+import javax.validation.constraints.NotBlank;
+
 public class LoginRequest {
+    @NotBlank(message = "Email wajib di isi")
     private String email;
+    @NotBlank(message = "Password wajib di isi")
     private String password;
 
     public String getEmail() {

@@ -18,14 +18,14 @@ public class GantiPasswordService {
 
     public void gantiPassword(Long userId, PasswordChangeRequest passwordChangeRequest) {
         UserModel userModel = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User tidak di temukan"));
 
         if (!passwordEncoder.matches(passwordChangeRequest.getPasswordLama(), userModel.getPassword())) {
-            throw new RuntimeException("Old password is incorrect");
+            throw new RuntimeException("Password lama salah");
         }
 
         if (!passwordChangeRequest.getPasswordBaru().equals(passwordChangeRequest.getKonfirmasiPassword())) {
-            throw new RuntimeException("New password and confirm password do not match");
+            throw new RuntimeException("Password baru dan Konfirmasi password tidak sama");
         }
 
         userModel.setPassword(passwordEncoder.encode(passwordChangeRequest.getPasswordBaru()));
