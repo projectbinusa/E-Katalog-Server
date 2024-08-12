@@ -44,4 +44,28 @@ public class AuthController {
     public CommonResponse<UserModel> register(@RequestBody UserDTO userModel){
         return ResponseHelper.ok(penggunaService.addPengguna(userModel));
     }
+
+    @PostMapping("/upload/image/{id}")
+    public ResponseEntity<?> uploadImage(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
+        try {
+            UserModel updatedUser = penggunaService.uploadImage(id, image);
+            return ResponseEntity.ok(updatedUser);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @PutMapping("/edit/image/{id}")
+    public ResponseEntity<?> updateImage(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
+        try {
+            UserModel updatedUser = penggunaService.uploadImage(id, image);
+            return ResponseEntity.ok(updatedUser);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
