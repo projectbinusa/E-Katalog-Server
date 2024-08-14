@@ -118,4 +118,9 @@ public class PenggunaService {
         return penggunaRepository.save(userModelOptional);
     }
 
+    public UserModel findById(Long userId) {
+        return penggunaRepository.findById(userId)
+                .orElse(null); // Return null if the user is not found
+    }
+
 }
