@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @RestController
 @RequestMapping("/api")
@@ -35,6 +36,23 @@ public class AuthController {
 
     @Autowired
     PenggunaService penggunaService;
+
+    @GetMapping("/users/by-id/{id}")
+    public ResponseEntity<?> getUserById(@PathVariable("id") long userId) {
+        try {
+            UserModel user = penggunaService.findById(userId);
+            if (user != null) {
+                user.setPassword(null); // Clear password for security reasons
+                return ResponseEntity.ok(user);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Collections.singletonMap("error", "User not found"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Failed to retrieve user: " + e.getMessage()));
+        }
+    }
 
     @PostMapping("/login")
     public CommonResponse<?> authenticatePengguna(@RequestBody LoginRequest loginRequest) {
