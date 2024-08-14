@@ -24,7 +24,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -33,7 +35,7 @@ import java.util.*;
 @Service
 public class PenggunaService {
 
-    static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/e-katalog-2b5a6.appspot.com/o/%s?alt=media";
+    static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/e-katalog-8a0a0.appspot.com/o/%s?alt=media";
 
     @Autowired
     private UserRepository penggunaRepository;
@@ -89,13 +91,22 @@ public class PenggunaService {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "admin/";
         String fullPath = folderPath + timestamp + "_" + fileName;
-        BlobId blobId = BlobId.of("e-katalog-2b5a6.appspot.com", fullPath);
+        BlobId blobId = BlobId.of("e-katalog-8a0a0.appspot.com", fullPath);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream("./src/main/resources/FirebaseConfig.json"));
+
+        // Mengakses file FbConfig.json dari classpath
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("FbConfig.json");
+        if (inputStream == null) {
+            throw new FileNotFoundException("Resource file FbConfig.json tidak ditemukan di classpath");
+        }
+
+        Credentials credentials = GoogleCredentials.fromStream(inputStream);
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, multipartFile.getBytes());
+
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
     }
+
 
     public UserModel uploadImage(Long id , MultipartFile image ) throws NotFoundException, IOException {
         UserModel userModelOptional = penggunaRepository.findById(id)
