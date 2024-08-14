@@ -61,7 +61,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/api/by-id/{id}",
             "/api/add",
             "/api/ubah/{id}",
-            "/api/hapus/{id}"
+            "/api/hapus/{id}",
+            "/api/upload/image"
 
     };
 
