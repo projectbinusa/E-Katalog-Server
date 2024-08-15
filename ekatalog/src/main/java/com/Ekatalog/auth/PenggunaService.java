@@ -123,4 +123,19 @@ public class PenggunaService {
                 .orElse(null); // Return null if the user is not found
     }
 
+    public UserModel updateUser(long userId, UserDTO userDTO) throws Exception {
+        Optional<UserModel> optionalUser = penggunaRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            UserModel user = optionalUser.get();
+            user.setUsername(userDTO.getUsername());
+            user.setEmail(userDTO.getEmail());
+            user.setPassword(userDTO.getPassword());
+            user.setRole(userDTO.getRole());
+
+            return penggunaRepository.save(user);
+        } else {
+            throw new Exception("User not found with ID: " + userId);
+        }
+    }
+
 }
