@@ -1,6 +1,7 @@
 package com.Ekatalog.controller;
 
 import com.Ekatalog.auth.PenggunaService;
+import com.Ekatalog.auth.UserDetailService;
 import com.Ekatalog.dto.LoginRequest;
 import com.Ekatalog.dto.UserDTO;
 import com.Ekatalog.exception.CommonResponse;
@@ -36,6 +37,22 @@ public class AuthController {
 
     @Autowired
     PenggunaService penggunaService;
+
+    @PutMapping("/users/update/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable("id") long userId, @RequestBody UserDTO userDTO) {
+        try {
+            UserModel updatedUser = penggunaService.updateUser(userId, userDTO);
+            if (updatedUser != null) {
+                updatedUser.setPassword("");
+                return ResponseEntity.ok(updatedUser);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Failed to update user: " + e.getMessage()));
+        }
+    }
 
     @GetMapping("/users/by-id/{id}")
     public ResponseEntity<?> getUserById(@PathVariable("id") long userId) {
