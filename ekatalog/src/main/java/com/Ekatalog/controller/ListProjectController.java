@@ -58,7 +58,7 @@ public class ListProjectController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/upload/image/{id}")
+    @PostMapping("/upload/image_list_project/{id}")
     public ResponseEntity<?> uploadImageListProject(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
         try {
             ListProjectModel uploadImage = listProjectService.uploadImageListProject(id, image);
@@ -70,7 +70,7 @@ public class ListProjectController {
         }
     }
 
-    @PutMapping("/edit/image/{id}")
+    @PutMapping("/edit/image_list_project/{id}")
     public ResponseEntity<?> updateImageListProject(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
         try {
             ListProjectModel updatedUser = listProjectService.uploadImageListProject(id, image);
