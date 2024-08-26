@@ -1,15 +1,31 @@
 package com.Ekatalog.service;
 
+import com.Ekatalog.exception.NotFoundException;
 import com.Ekatalog.model.ListProjectModel;
 import com.Ekatalog.repository.ListProjectRepository;
+import com.google.auth.Credentials;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.BlobId;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class ListProjectService {
+
+    static final String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/e-katalog-8a0a0.appspot.com/o/%s?alt=media";
+
     @Autowired
     private ListProjectRepository listProjectRepository;
 
@@ -39,5 +55,36 @@ public class ListProjectService {
 
     public void deleteProject(Long id) {
         listProjectRepository.deleteById(id);
+    }
+
+    private String uploadFotoListProject(MultipartFile multipartFile, String fileName) throws IOException {
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String folderPath = "list_project/";
+        String fullPath = folderPath + timestamp + "_" + fileName;
+        BlobId blobId = BlobId.of("e-katalog-8a0a0.appspot.com", fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+
+        // Mengakses file FbConfig.json dari classpath
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("FbConfig.json");
+        if (inputStream == null) {
+            throw new FileNotFoundException("Resource file FbConfig.json tidak ditemukan di classpath");
+        }
+
+        Credentials credentials = GoogleCredentials.fromStream(inputStream);
+        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        storage.create(blobInfo, multipartFile.getBytes());
+
+        return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
+    }
+
+
+    public ListProjectModel uploadImageListProject(Long id , MultipartFile image ) throws NotFoundException, IOException {
+        ListProjectModel listProjectModel = listProjectRepository.findById(id)
+                .orElseThrow(()  -> new NotFoundException("Id tidak ditemukan"));
+
+        String fileUrl = uploadFotoListProject(image , "fotolistproject_" + id);
+        listProjectModel.setImage(fileUrl);
+
+        return listProjectRepository.save(listProjectModel);
     }
 }

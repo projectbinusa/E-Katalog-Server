@@ -74,4 +74,7 @@ public class ListProjectModel {
     public void setNama_project(String nama_project) {
         this.nama_project = nama_project;
     }
+
+    public void setImage(String fileUrl) {
+    }
 }
