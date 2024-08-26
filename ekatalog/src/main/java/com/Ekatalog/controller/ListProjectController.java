@@ -3,8 +3,8 @@ package com.Ekatalog.controller;
 import com.Ekatalog.dto.ListProjectDTO;
 import com.Ekatalog.exception.NotFoundException;
 import com.Ekatalog.model.ListProjectModel;
-import com.Ekatalog.model.UserModel;
 import com.Ekatalog.service.ListProjectService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,23 +23,33 @@ public class ListProjectController {
     private ListProjectService listProjectService;
 
     @GetMapping("/all")
-    public List<ListProjectModel> getAllProjects() {
-        return listProjectService.getAllProjects();
+    public ResponseEntity<List<ListProjectModel>> getAllProjects() {
+        List<ListProjectModel> projects = listProjectService.getAllProjects();
+        return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/by-id/{id}")
     public ResponseEntity<ListProjectModel> getProjectById(@PathVariable Long id) {
         Optional<ListProjectModel> project = listProjectService.getProjectById(id);
-        if (project.isPresent()) {
-            return ResponseEntity.ok(project.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return project.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/add/byId/{id}")
-    public ListProjectModel addProject(@PathVariable Long id , @RequestBody ListProjectModel listProject ,@RequestPart("image") MultipartFile image) throws IOException {
-        return listProjectService.addProject(id , listProject , image);
+    public ResponseEntity<String> addListProject(
+            @PathVariable Long id,
+            @RequestPart("image") MultipartFile image,
+            @RequestPart("listProject") String listProjectJson) {
+
+        try {
+            // Konversi JSON ke dalam Object
+            ObjectMapper objectMapper = new ObjectMapper();
+            ListProjectModel listProject = objectMapper.readValue(listProjectJson, ListProjectModel.class);
+
+            ListProjectModel listProjectModel = listProjectService.addProject(id, listProject, image);
+            return ResponseEntity.ok("Data project berhasil ditambahkan.");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Gagal memproses data.");
+        }
     }
 
     @PutMapping("/ubah/{id}")
@@ -61,24 +71,24 @@ public class ListProjectController {
     @PostMapping("/upload/imagelistproject/{id}")
     public ResponseEntity<?> uploadImageListProject(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
         try {
-            ListProjectModel uploadImageListProject = listProjectService.uploadImageListProject(id, image);
-            return ResponseEntity.ok(uploadImageListProject);
+            ListProjectModel updatedProject = listProjectService.uploadImageListProject(id, image);
+            return ResponseEntity.ok(updatedProject);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project tidak ditemukan.");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Gagal mengunggah gambar.");
         }
     }
 
     @PutMapping("/edit/imagelistproject/{id}")
     public ResponseEntity<?> updateImageListProject(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
         try {
-            ListProjectModel uploadImageListProject = listProjectService.uploadImageListProject(id, image);
-            return ResponseEntity.ok(uploadImageListProject);
+            ListProjectModel updatedProject = listProjectService.uploadImageListProject(id, image);
+            return ResponseEntity.ok(updatedProject);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project tidak ditemukan.");
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Gagal mengunggah gambar.");
         }
     }
 }
