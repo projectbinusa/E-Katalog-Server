@@ -2,7 +2,9 @@ package com.Ekatalog.service;
 
 import com.Ekatalog.exception.NotFoundException;
 import com.Ekatalog.model.ListProjectModel;
+import com.Ekatalog.model.UserModel;
 import com.Ekatalog.repository.ListProjectRepository;
+import com.Ekatalog.repository.UserRepository;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -18,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +33,9 @@ public class ListProjectService {
     @Autowired
     private ListProjectRepository listProjectRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public List<ListProjectModel> getAllProjects() {
         return listProjectRepository.findAll();
     }
@@ -37,7 +44,18 @@ public class ListProjectService {
         return listProjectRepository.findById(id);
     }
 
-    public ListProjectModel addProject(ListProjectModel listProject) {
+    public ListProjectModel addProject(Long id , ListProjectModel listProject , MultipartFile image) throws IOException {
+        Optional<UserModel> userModel = userRepository.findById(id);
+        if (!userModel.isPresent()){
+            throw new NotFoundException("id tidak ditemukan : " + id);
+        }
+        String fileUrl = uploadFotoListProject(image , "ListProject");
+        listProject.setNama_project(listProject.getNama_project());
+        listProject.setTeknologi(listProject.getTeknologi());
+        listProject.setImage(fileUrl);
+        listProject.setDeskripsi_project(listProject.getDeskripsi_project());
+        listProject.setDeveloper(listProject.getDeveloper());
+
         return listProjectRepository.save(listProject);
     }
 
@@ -47,7 +65,7 @@ public class ListProjectService {
         project.setNama_project(projectDetails.getNama_project());
         project.setTeknologi(projectDetails.getTeknologi());
         project.setDeveloper(projectDetails.getDeveloper());
-        project.setLink(projectDetails.getLink());
+        project.setImage(projectDetails.getImage());
         project.setDeskripsi_project(projectDetails.getDeskripsi_project());
 
         return listProjectRepository.save(project);
@@ -61,10 +79,18 @@ public class ListProjectService {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String folderPath = "list_project/";
         String fullPath = folderPath + timestamp + "_" + fileName;
-        BlobId blobId = BlobId.of("e-katalog-8a0a0.appspot.com", fullPath);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
 
-        // Mengakses file FbConfig.json dari classpath
+        String contentType = multipartFile.getContentType();
+        if (contentType == null || contentType.equals("application/octet-stream")) {
+            contentType = Files.probeContentType(Paths.get(multipartFile.getOriginalFilename()));
+            if (contentType == null) {
+                contentType = "application/octet-stream";
+            }
+        }
+
+        BlobId blobId = BlobId.of("e-katalog-8a0a0.appspot.com", fullPath);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(contentType).build();
+
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("FbConfig.json");
         if (inputStream == null) {
             throw new FileNotFoundException("Resource file FbConfig.json tidak ditemukan di classpath");
@@ -72,10 +98,12 @@ public class ListProjectService {
 
         Credentials credentials = GoogleCredentials.fromStream(inputStream);
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+
         storage.create(blobInfo, multipartFile.getBytes());
 
         return String.format(DOWNLOAD_URL, URLEncoder.encode(fullPath, StandardCharsets.UTF_8));
     }
+
 
 
     public ListProjectModel uploadImageListProject(Long id , MultipartFile image ) throws NotFoundException, IOException {
