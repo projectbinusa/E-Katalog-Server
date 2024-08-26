@@ -2,7 +2,9 @@ package com.Ekatalog.service;
 
 import com.Ekatalog.exception.NotFoundException;
 import com.Ekatalog.model.ListProjectModel;
+import com.Ekatalog.model.UserModel;
 import com.Ekatalog.repository.ListProjectRepository;
+import com.Ekatalog.repository.UserRepository;
 import com.google.auth.Credentials;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.BlobId;
@@ -29,6 +31,9 @@ public class ListProjectService {
     @Autowired
     private ListProjectRepository listProjectRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public List<ListProjectModel> getAllProjects() {
         return listProjectRepository.findAll();
     }
@@ -37,7 +42,16 @@ public class ListProjectService {
         return listProjectRepository.findById(id);
     }
 
-    public ListProjectModel addProject(ListProjectModel listProject) {
+    public ListProjectModel addProject(Long id , ListProjectModel listProject , MultipartFile image) throws IOException {
+        Optional<UserModel> userModel = userRepository.findById(id);
+        if (!userModel.isPresent()){
+            throw new NotFoundException("id tidak ditemukan : " + id);
+        }
+        listProject.setNama_project(listProject.getNama_project());
+        listProject.setTeknologi(listProject.getTeknologi());
+        listProject.setImage(uploadFotoListProject(image , "ListProject"));
+        listProject.setDeskripsi_project(listProject.getDeskripsi_project());
+        listProject.setDeveloper(listProject.getDeveloper());
         return listProjectRepository.save(listProject);
     }
 
@@ -47,7 +61,7 @@ public class ListProjectService {
         project.setNama_project(projectDetails.getNama_project());
         project.setTeknologi(projectDetails.getTeknologi());
         project.setDeveloper(projectDetails.getDeveloper());
-        project.setLink(projectDetails.getLink());
+        project.setImage(projectDetails.getImage());
         project.setDeskripsi_project(projectDetails.getDeskripsi_project());
 
         return listProjectRepository.save(project);

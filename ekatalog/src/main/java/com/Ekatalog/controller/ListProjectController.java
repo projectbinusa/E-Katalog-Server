@@ -37,9 +37,9 @@ public class ListProjectController {
         }
     }
 
-    @PostMapping("/add")
-    public ListProjectModel addProject(@RequestBody ListProjectModel listProject) {
-        return listProjectService.addProject(listProject);
+    @PostMapping("/add/byId/{id}")
+    public ListProjectModel addProject(@PathVariable Long id , @RequestBody ListProjectModel listProject ,@RequestPart("image") MultipartFile image) throws IOException {
+        return listProjectService.addProject(id , listProject , image);
     }
 
     @PutMapping("/ubah/{id}")
