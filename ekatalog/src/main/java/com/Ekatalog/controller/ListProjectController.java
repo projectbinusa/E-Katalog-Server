@@ -61,8 +61,8 @@ public class ListProjectController {
     @PostMapping("/upload/imagelistproject/{id}")
     public ResponseEntity<?> uploadImageListProject(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
         try {
-            ListProjectModel uploadImage = listProjectService.uploadImageListProject(id, image);
-            return ResponseEntity.ok(uploadImage);
+            ListProjectModel uploadImageListProject = listProjectService.uploadImageListProject(id, image);
+            return ResponseEntity.ok(uploadImageListProject);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (IOException e) {
@@ -73,8 +73,8 @@ public class ListProjectController {
     @PutMapping("/edit/imagelistproject/{id}")
     public ResponseEntity<?> updateImageListProject(@PathVariable Long id, @RequestPart("image") MultipartFile image) {
         try {
-            ListProjectModel updatedUser = listProjectService.uploadImageListProject(id, image);
-            return ResponseEntity.ok(updatedUser);
+            ListProjectModel uploadImageListProject = listProjectService.uploadImageListProject(id, image);
+            return ResponseEntity.ok(uploadImageListProject);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } catch (IOException e) {
