@@ -53,6 +53,7 @@ public class ListProjectService {
         listProject.setNama_project(listProject.getNama_project());
         listProject.setTeknologi(listProject.getTeknologi());
         listProject.setImage(fileUrl);
+        listProject.setLink(listProject.getLink());
         listProject.setDeskripsi_project(listProject.getDeskripsi_project());
         listProject.setDeveloper(listProject.getDeveloper());
 
@@ -66,6 +67,7 @@ public class ListProjectService {
         project.setTeknologi(projectDetails.getTeknologi());
         project.setDeveloper(projectDetails.getDeveloper());
         project.setImage(projectDetails.getImage());
+        project.setLink(projectDetails.getLink());
         project.setDeskripsi_project(projectDetails.getDeskripsi_project());
 
         return listProjectRepository.save(project);

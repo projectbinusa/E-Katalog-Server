@@ -21,12 +21,11 @@ public class ListProjectModel {
     @Column(name = "developer")
     private String developer;
 
+    @Column(name = "link")
+    private String link;
+
     @Column(name = "image")
     private String image;
-
-    public String getImage() {
-        return image;
-    }
 
     @Column(name = "deskripsi_project")
     private String deskripsi_project;
@@ -71,7 +70,19 @@ public class ListProjectModel {
         this.nama_project = nama_project;
     }
 
+    public String getImage() {
+        return image;
+    }
+
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getLink() {
+        return link;
+    }
+
+    public void setLink(String link) {
+        this.link = link;
     }
 }
