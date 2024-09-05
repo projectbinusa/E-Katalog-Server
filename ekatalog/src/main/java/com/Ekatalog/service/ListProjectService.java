@@ -60,18 +60,49 @@ public class ListProjectService {
         return listProjectRepository.save(listProject);
     }
 
-    public ListProjectModel updateProject(Long id, ListProjectModel projectDetails) {
-        ListProjectModel project = listProjectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project not found"));
+    public ListProjectModel updateProject(Long id, ListProjectModel projectModel, MultipartFile image) throws IOException {
+        Optional<ListProjectModel> optionalListProjectModel = listProjectRepository.findById(id);
 
-        project.setNama_project(projectDetails.getNama_project());
-        project.setTeknologi(projectDetails.getTeknologi());
-        project.setDeveloper(projectDetails.getDeveloper());
-        project.setImage(projectDetails.getImage());
-        project.setLink(projectDetails.getLink());
-        project.setDeskripsi_project(projectDetails.getDeskripsi_project());
+        // Memeriksa apakah project dengan ID yang diberikan ada
+        if (!optionalListProjectModel.isPresent()) {
+            throw new NotFoundException("ID tidak ditemukan: " + id);
+        }
 
-        return listProjectRepository.save(project);
+        // Mengambil model yang sudah ada dari database
+        ListProjectModel existingProject = optionalListProjectModel.get();
+
+        // Mengunggah gambar baru jika ada
+        String fileUrl = uploadFotoListProject(image, "ListProject");
+
+        // Memperbarui data yang ada dengan data baru
+        existingProject.setNama_project(projectModel.getNama_project());
+        existingProject.setTeknologi(projectModel.getTeknologi());
+
+        // Hanya memperbarui gambar jika file baru diunggah
+        if (fileUrl != null && !fileUrl.isEmpty()) {
+            existingProject.setImage(fileUrl);
+        }
+
+        existingProject.setLink(projectModel.getLink());
+        existingProject.setDeskripsi_project(projectModel.getDeskripsi_project());
+        existingProject.setDeveloper(projectModel.getDeveloper());
+
+        // Menyimpan perubahan pada project yang sudah ada
+        return listProjectRepository.save(existingProject);
     }
+
+//    public ListProjectModel updateProject(Long id, ListProjectModel projectDetails) {
+//        ListProjectModel project = listProjectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project not found"));
+//
+//        project.setNama_project(projectDetails.getNama_project());
+//        project.setTeknologi(projectDetails.getTeknologi());
+//        project.setDeveloper(projectDetails.getDeveloper());
+//        project.setImage(projectDetails.getImage());
+//        project.setLink(projectDetails.getLink());
+//        project.setDeskripsi_project(projectDetails.getDeskripsi_project());
+//
+//        return listProjectRepository.save(project);
+//    }
 
     public void deleteProject(Long id) {
         listProjectRepository.deleteById(id);
