@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -52,13 +53,37 @@ public class ListProjectController {
         }
     }
 
+//    @PutMapping("/ubah/{id}")
+//    public ResponseEntity<ListProjectModel> updateProject(@PathVariable Long id, @RequestBody ListProjectModel projectDetails) {
+//        try {
+//            ListProjectModel updatedProject = listProjectService.updateProject(id, projectDetails);
+//            return ResponseEntity.ok(updatedProject);
+//        } catch (RuntimeException e) {
+//            return ResponseEntity.notFound().build();
+//        }
+//    }
+
     @PutMapping("/ubah/{id}")
-    public ResponseEntity<ListProjectModel> updateProject(@PathVariable Long id, @RequestBody ListProjectModel projectDetails) {
+    public ResponseEntity<String> updateListProject(
+            @PathVariable Long id,
+            @RequestPart("image") MultipartFile image,
+            @RequestPart("listProject") MultipartFile listProjectJson) {
+
         try {
-            ListProjectModel updatedProject = listProjectService.updateProject(id, projectDetails);
-            return ResponseEntity.ok(updatedProject);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            // Convert MultipartFile to String
+            String jsonContent = new String(listProjectJson.getBytes());
+
+            // Convert JSON String to Object
+            ObjectMapper objectMapper = new ObjectMapper();
+            ListProjectModel listProject = objectMapper.readValue(jsonContent, ListProjectModel.class);
+
+            // Update the project
+            listProjectService.updateProject(id, listProject, image);
+            return ResponseEntity.ok("Data project berhasil diperbarui.");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Gagal memproses data: " + e.getMessage());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project not found: " + e.getMessage());
         }
     }
 
