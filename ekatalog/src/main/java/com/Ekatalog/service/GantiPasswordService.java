@@ -17,17 +17,21 @@ public class GantiPasswordService {
     private PasswordEncoder passwordEncoder;
 
     public void gantiPassword(Long userId, PasswordChangeRequest passwordChangeRequest) {
+        // Fetch user by ID
         UserModel userModel = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User tidak di temukan"));
+                .orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
 
+        // Check if old password matches
         if (!passwordEncoder.matches(passwordChangeRequest.getPasswordLama(), userModel.getPassword())) {
             throw new RuntimeException("Password lama salah");
         }
 
+        // Check if new password and confirmation match
         if (!passwordChangeRequest.getPasswordBaru().equals(passwordChangeRequest.getKonfirmasiPassword())) {
-            throw new RuntimeException("Password baru dan Konfirmasi password tidak sama");
+            throw new RuntimeException("Password baru dan konfirmasi password tidak sama");
         }
 
+        // Encode and update the new password
         userModel.setPassword(passwordEncoder.encode(passwordChangeRequest.getPasswordBaru()));
         userRepository.save(userModel);
     }
