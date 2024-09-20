@@ -14,11 +14,11 @@ public class GantiPasswordController {
     @Autowired
     private GantiPasswordService gantiPasswordService;
 
-    @PostMapping("/change-password")
-    public ResponseEntity<String> changePassword(@RequestBody PasswordChangeRequest passwordChangeRequest) {
+    @PutMapping("/change-password/{userId}")
+    public ResponseEntity<String> changePassword(@PathVariable Long userId, @RequestBody PasswordChangeRequest passwordChangeRequest) {
         try {
             // Call service to handle the password change logic
-            gantiPasswordService.gantiPassword(passwordChangeRequest.getUserId(), passwordChangeRequest);
+            gantiPasswordService.gantiPassword(userId, passwordChangeRequest);
             return ResponseEntity.ok("Password changed successfully");
         } catch (RuntimeException e) {
             // Return error message in case of an exception
