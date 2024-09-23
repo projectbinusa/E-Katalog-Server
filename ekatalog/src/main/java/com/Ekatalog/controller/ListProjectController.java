@@ -66,26 +66,33 @@ public class ListProjectController {
     @PutMapping("/ubah/{id}")
     public ResponseEntity<String> updateListProject(
             @PathVariable Long id,
-            @RequestPart("image") MultipartFile image,
-            @RequestPart("listProject") MultipartFile listProjectJson) {
-
+            @RequestBody ListProjectModel listProject) {
         try {
-            // Convert MultipartFile to String
-            String jsonContent = new String(listProjectJson.getBytes());
-
-            // Convert JSON String to Object
-            ObjectMapper objectMapper = new ObjectMapper();
-            ListProjectModel listProject = objectMapper.readValue(jsonContent, ListProjectModel.class);
-
-            // Update the project
-            listProjectService.updateProject(id, listProject, image);
+            // Update the project data (without image)
+            listProjectService.updateProject(id, listProject, null);
             return ResponseEntity.ok("Data project berhasil diperbarui.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project not found: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/update-image/{id}")
+    public ResponseEntity<String> updateProjectImage(
+            @PathVariable Long id,
+            @RequestPart("image") MultipartFile image) {
+        try {
+            // Update only the image
+            listProjectService.updateProject(id, null, image);
+            return ResponseEntity.ok("Image berhasil diperbarui.");
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Gagal memproses data: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error uploading image: " + e.getMessage());
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Project not found: " + e.getMessage());
         }
     }
+
 
     @DeleteMapping("/hapus/{id}")
     public ResponseEntity<Void> deleteProject(@PathVariable Long id) {
