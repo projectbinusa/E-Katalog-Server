@@ -60,36 +60,32 @@ public class ListProjectService {
         return listProjectRepository.save(listProject);
     }
 
-    public ListProjectModel updateProject(Long id, ListProjectModel projectModel, MultipartFile image) throws IOException {
-        Optional<ListProjectModel> optionalListProjectModel = listProjectRepository.findById(id);
+    public void updateProject(Long id, ListProjectModel listProject, MultipartFile image) throws IOException {
+        Optional<ListProjectModel> projectOpt = listProjectRepository.findById(id);
+        if (projectOpt.isPresent()) {
+            ListProjectModel existingProject = projectOpt.get();
 
-        // Memeriksa apakah project dengan ID yang diberikan ada
-        if (!optionalListProjectModel.isPresent()) {
-            throw new NotFoundException("ID tidak ditemukan: " + id);
+            if (listProject != null) {
+                // Update project details
+                existingProject.setNama_project(listProject.getNama_project());
+                existingProject.setDeveloper(listProject.getDeveloper());
+                existingProject.setDeskripsi_project(listProject.getDeskripsi_project());
+                existingProject.setTeknologi(listProject.getTeknologi());
+                existingProject.setLink(listProject.getLink());
+            }
+
+            if (image != null && !image.isEmpty()) {
+                // Save the image if provided
+                String imageName = uploadFotoListProject(image , "FotoProject");
+                existingProject.setImage(imageName);
+            }
+
+            listProjectRepository.save(existingProject);
+        } else {
+            throw new NotFoundException("Project with id " + id + " not found.");
         }
-
-        // Mengambil model yang sudah ada dari database
-        ListProjectModel existingProject = optionalListProjectModel.get();
-
-        // Mengunggah gambar baru jika ada
-        String fileUrl = uploadFotoListProject(image, "ListProject");
-
-        // Memperbarui data yang ada dengan data baru
-        existingProject.setNama_project(projectModel.getNama_project());
-        existingProject.setTeknologi(projectModel.getTeknologi());
-
-        // Hanya memperbarui gambar jika file baru diunggah
-        if (fileUrl != null && !fileUrl.isEmpty()) {
-            existingProject.setImage(fileUrl);
-        }
-
-        existingProject.setLink(projectModel.getLink());
-        existingProject.setDeskripsi_project(projectModel.getDeskripsi_project());
-        existingProject.setDeveloper(projectModel.getDeveloper());
-
-        // Menyimpan perubahan pada project yang sudah ada
-        return listProjectRepository.save(existingProject);
     }
+
 
 //    public ListProjectModel updateProject(Long id, ListProjectModel projectDetails) {
 //        ListProjectModel project = listProjectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project not found"));
